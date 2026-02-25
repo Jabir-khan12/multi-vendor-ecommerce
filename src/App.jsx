@@ -9,7 +9,9 @@ import Signup from './pages/Signup';
 import VendorDashboard from './pages/VendorDashboard';
 import SearchResults from './pages/SearchResults';
 import Orders from './pages/Orders';
+import ProductDetails from './pages/ProductDetails';
 import './index.css';
+
 
 
 
@@ -30,7 +32,9 @@ function App() {
             <Route path="/dashboard" element={<VendorDashboard />} />
             <Route path="/search" element={<SearchResults />} />
             <Route path="/orders" element={<Orders />} />
+            <Route path="/product/:id" element={<ProductDetails />} />
           </Routes>
+
 
 
 

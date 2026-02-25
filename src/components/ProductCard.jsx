@@ -9,18 +9,20 @@ const ProductCard = ({ product }) => {
     return (
         <div className="product-card">
             <div className="product-image-container">
-                <img
-                    src={product.images && product.images[0] ? product.images[0] : product.image}
-                    alt={product.name}
-                    className="product-image"
-                />
+                <Link to={`/product/${product._id}`}>
+                    <img
+                        src={product.images && product.images[0] ? product.images[0] : product.image}
+                        alt={product.name}
+                        className="product-image"
+                    />
+                </Link>
                 <div className="product-actions">
                     <button className="add-to-cart-quick" onClick={() => addToCart(product)}>
                         <ShoppingCart size={20} />
                     </button>
                 </div>
-
             </div>
+
 
             <div className="product-info">
                 <div className="product-vendor">
@@ -44,7 +46,7 @@ const ProductCard = ({ product }) => {
                     )}
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 
