@@ -22,7 +22,23 @@ const orderSchema = new mongoose.Schema({
         country: String
     },
     paymentIntentId: String,
-    createdAt: { type: Date, default: Date.now }
+    paymentStatus: {
+        type: String,
+        enum: ['unpaid', 'paid', 'failed', 'refunded'],
+        default: 'unpaid'
+    },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
+});
+
+// Indexes for common queries
+orderSchema.index({ customerId: 1 });
+orderSchema.index({ createdAt: -1 });
+orderSchema.index({ status: 1 });
+
+// Update updatedAt on save
+orderSchema.pre('save', function () {
+    this.updatedAt = Date.now();
 });
 
 export default mongoose.model('Order', orderSchema);

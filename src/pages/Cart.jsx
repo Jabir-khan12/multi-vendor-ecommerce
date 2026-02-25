@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Trash2, Plus, Minus, ArrowRight, ShieldCheck, Truck } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
@@ -6,10 +6,9 @@ import { useAuth } from '../context/AuthContext';
 import './Cart.css';
 
 const Cart = () => {
-    const { cartItems, removeFromCart, updateQuantity, cartTotal, clearCart } = useCart();
+    const { cartItems, removeFromCart, updateQuantity, cartTotal } = useCart();
     const { user } = useAuth();
     const navigate = useNavigate();
-    const [isCheckingOut, setIsCheckingOut] = useState(false);
 
     const shipping = cartItems.length > 0 ? 12.50 : 0;
     const tax = cartTotal * 0.08;
@@ -21,45 +20,7 @@ const Cart = () => {
             return;
         }
 
-        setIsCheckingOut(true);
-        try {
-            const orderData = {
-                customerId: user.id,
-                items: cartItems.map(item => ({
-                    productId: item._id,
-                    quantity: item.quantity,
-                    price: item.price,
-                    vendorId: item.vendorId._id || item.vendorId
-                })),
-                totalAmount: total,
-                shippingAddress: {
-                    street: '123 Test St',
-                    city: 'New York',
-                    state: 'NY',
-                    zipCode: '10001',
-                    country: 'USA'
-                }
-            };
-
-            const response = await fetch('http://localhost:5000/api/orders', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(orderData)
-            });
-
-            if (response.ok) {
-                clearCart();
-                alert('Order placed successfully!');
-                navigate('/');
-            } else {
-                alert('Failed to place order.');
-            }
-        } catch (error) {
-            console.error('Checkout error:', error);
-            alert('Something went wrong.');
-        } finally {
-            setIsCheckingOut(false);
-        }
+        navigate('/checkout');
     };
 
 
@@ -162,11 +123,9 @@ const Cart = () => {
                             <button
                                 className="btn btn-primary checkout-btn"
                                 onClick={handleCheckout}
-                                disabled={cartItems.length === 0 || isCheckingOut}
+                                disabled={cartItems.length === 0}
                             >
-                                {isCheckingOut ? 'Processing...' : (
-                                    <>Proceed to Checkout <ArrowRight size={18} /></>
-                                )}
+                                <>Proceed to Checkout <ArrowRight size={18} /></>
                             </button>
 
                             <div className="checkout-trust-badges">

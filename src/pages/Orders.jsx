@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Package, Clock, CheckCircle, ChevronRight } from 'lucide-react';
+import { apiClient } from '../config/api';
 
 const Orders = () => {
     const { user } = useAuth();
@@ -10,8 +11,8 @@ const Orders = () => {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const response = await fetch(`http://localhost:5000/api/orders/customer/${user.id}`);
-                const data = await response.json();
+                const customerId = user?.userId || user?.id;
+                const data = await apiClient.get(`/api/orders/customer/${customerId}`);
                 setOrders(data);
             } catch (error) {
                 console.error('Error fetching orders:', error);

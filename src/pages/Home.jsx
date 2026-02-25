@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 import VendorCard from '../components/VendorCard';
+import { apiClient } from '../config/api';
 import './Home.css';
 
 const Home = () => {
@@ -10,9 +11,8 @@ const Home = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/products');
-                const data = await response.json();
-                setProducts(data);
+                const data = await apiClient.get('/api/products?sort=featured&limit=8');
+                setProducts(data.products || data);
             } catch (error) {
                 console.error('Error fetching products:', error);
             } finally {

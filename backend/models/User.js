@@ -3,10 +3,21 @@ import bcrypt from 'bcryptjs';
 
 const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
+    email: { 
+        type: String, 
+        required: true, 
+        unique: true,
+        lowercase: true,
+        trim: true
+    },
     password: { type: String, required: true },
-    role: { type: String, enum: ['customer', 'vendor', 'admin'], default: 'customer' },
-    createdAt: { type: Date, default: Date.now }
+    role: { 
+        type: String, 
+        enum: ['customer', 'vendor', 'admin'], 
+        default: 'customer' 
+    },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
 });
 
 // Hash password before saving
@@ -15,6 +26,10 @@ userSchema.pre('save', async function () {
     this.password = await bcrypt.hash(this.password, 10);
 });
 
+// Update updatedAt on save
+userSchema.pre('save', function () {
+    this.updatedAt = Date.now();
+});
 
 // Compare password
 userSchema.methods.comparePassword = async function (candidatePassword) {

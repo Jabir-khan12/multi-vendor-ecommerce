@@ -10,7 +10,20 @@ const vendorSchema = new mongoose.Schema({
     rating: { type: Number, default: 0 },
     reviewsCount: { type: Number, default: 0 },
     isVerified: { type: Boolean, default: false },
-    createdAt: { type: Date, default: Date.now }
+    verificationStatus: { 
+        type: String, 
+        enum: ['pending', 'approved', 'rejected'], 
+        default: 'pending' 
+    },
+    verificationNotes: { type: String },
+    rejectionReason: { type: String },
+    isSuspended: { type: Boolean, default: false },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
 });
+
+// Index for common queries
+vendorSchema.index({ userId: 1 });
+vendorSchema.index({ verificationStatus: 1 });
 
 export default mongoose.model('Vendor', vendorSchema);

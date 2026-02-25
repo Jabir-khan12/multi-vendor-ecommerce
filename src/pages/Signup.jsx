@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { apiClient } from '../config/api';
 import './Login.css'; // Reusing styles
 
 const Signup = () => {
@@ -25,20 +26,11 @@ const Signup = () => {
         const endpoint = formData.role === 'vendor' ? '/api/auth/register-vendor' : '/api/auth/register';
 
         try {
-            const response = await fetch(`http://localhost:5000${endpoint}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
-            });
-            const data = await response.json();
-            if (response.ok) {
-                login(data.user, data.token);
-                navigate('/');
-            } else {
-                setError(data.message);
-            }
+            const data = await apiClient.post(endpoint, formData);
+            login(data.user);
+            navigate('/');
         } catch (err) {
-            setError('Something went wrong. Please try again.');
+            setError(err?.message || 'Something went wrong. Please try again.');
         }
     };
 

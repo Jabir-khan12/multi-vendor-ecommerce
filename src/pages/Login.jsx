@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { apiClient } from '../config/api';
 import './Login.css';
 
 const Login = () => {
@@ -12,21 +13,13 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError('');
         try {
-            const response = await fetch('http://localhost:5000/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
-            });
-            const data = await response.json();
-            if (response.ok) {
-                login(data.user, data.token);
-                navigate('/');
-            } else {
-                setError(data.message);
-            }
+            const data = await apiClient.post('/api/auth/login', { email, password });
+            login(data.user);
+            navigate('/');
         } catch (err) {
-            setError('Something went wrong. Please try again.');
+            setError(err?.message || 'Something went wrong. Please try again.');
         }
     };
 

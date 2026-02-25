@@ -4,6 +4,7 @@ import { Star, ShoppingCart, ShieldCheck, Truck, ArrowLeft } from 'lucide-react'
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
+import { apiClient } from '../config/api';
 import './ProductDetails.css';
 
 const ProductDetails = () => {
@@ -19,13 +20,11 @@ const ProductDetails = () => {
         const fetchProductAndReviews = async () => {
             try {
                 const [productRes, reviewsRes] = await Promise.all([
-                    fetch(`http://localhost:5000/api/products/${id}`),
-                    fetch(`http://localhost:5000/api/reviews/product/${id}`)
+                    apiClient.get(`/api/products/${id}`),
+                    apiClient.get(`/api/reviews/product/${id}`)
                 ]);
-                const productData = await productRes.json();
-                const reviewsData = await reviewsRes.json();
-                setProduct(productData);
-                setReviews(reviewsData);
+                setProduct(productRes);
+                setReviews(reviewsRes);
             } catch (error) {
                 console.error('Error fetching data:', error);
             } finally {
@@ -40,26 +39,19 @@ const ProductDetails = () => {
         if (!user) return alert('Please login to leave a review');
 
         try {
-            const response = await fetch('http://localhost:5000/api/reviews', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    productId: id,
-                    customerId: user.id,
-                    ...newReview
-                })
+            const savedReview = await apiClient.post('/api/reviews', {
+                productId: id,
+                customerId: user.userId || user.id,
+                ...newReview
             });
-            if (response.ok) {
-                const savedReview = await response.json();
-                setReviews([...reviews, { ...savedReview, customerId: { name: user.name } }]);
-                setNewReview({ rating: 5, comment: '' });
-                // Update product stats locally
-                setProduct(prev => ({
-                    ...prev,
-                    reviewsCount: (prev.reviewsCount || 0) + 1,
-                    rating: Number(((prev.rating * (prev.reviewsCount || 0) + newReview.rating) / ((prev.reviewsCount || 0) + 1)).toFixed(1))
-                }));
-            }
+            setReviews([...reviews, { ...savedReview, customerId: { name: user.name } }]);
+            setNewReview({ rating: 5, comment: '' });
+            // Update product stats locally
+            setProduct(prev => ({
+                ...prev,
+                reviewsCount: (prev.reviewsCount || 0) + 1,
+                rating: Number(((prev.rating * (prev.reviewsCount || 0) + newReview.rating) / ((prev.reviewsCount || 0) + 1)).toFixed(1))
+            }));
         } catch (error) {
             console.error('Error posting review:', error);
         }

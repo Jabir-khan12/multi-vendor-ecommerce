@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, User, Menu, Store, LogOut, Layout } from 'lucide-react';
+import { Search, ShoppingCart, User, Menu, Store, LogOut, Layout, Package } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import './Navbar.css';
@@ -19,6 +19,11 @@ const Navbar = () => {
         if (e.key === 'Enter' && searchTerm.trim()) {
             navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
         }
+    };
+
+    const handleLogout = async () => {
+        await logout();
+        navigate('/');
     };
 
     return (
@@ -70,7 +75,7 @@ const Navbar = () => {
                                 <User size={24} />
                                 <span className="profile-text">{user.name}</span>
                             </button>
-                            <button onClick={logout} className="nav-action logout-btn" title="Logout">
+                            <button onClick={handleLogout} className="nav-action logout-btn" title="Logout">
                                 <LogOut size={20} />
                             </button>
                         </div>

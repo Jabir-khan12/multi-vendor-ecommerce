@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Star, MapPin, Calendar, Share2, ShieldCheck } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
+import { apiClient } from '../config/api';
 import './VendorProfile.css';
 
 const VendorProfile = () => {
@@ -14,13 +15,11 @@ const VendorProfile = () => {
         const fetchVendorData = async () => {
             try {
                 const [vendorRes, productsRes] = await Promise.all([
-                    fetch(`http://localhost:5000/api/vendors/${id}`),
-                    fetch(`http://localhost:5000/api/products?vendorId=${id}`)
+                    apiClient.get(`/api/vendors/${id}`),
+                    apiClient.get(`/api/products?vendorId=${id}&limit=100`)
                 ]);
-                const vendorData = await vendorRes.json();
-                const productsData = await productsRes.json();
-                setVendor(vendorData);
-                setProducts(productsData);
+                setVendor(vendorRes);
+                setProducts(productsRes.products || productsRes);
             } catch (error) {
                 console.error('Error fetching vendor data:', error);
             } finally {
