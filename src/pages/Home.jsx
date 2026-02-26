@@ -6,20 +6,28 @@ import './Home.css';
 
 const Home = () => {
     const [products, setProducts] = useState([]);
+    const [vendors, setVendors] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchProducts = async () => {
+        const fetchData = async () => {
             try {
-                const data = await apiClient.get('/api/products?sort=featured&limit=8');
-                setProducts(data.products || data);
+                const productData = await apiClient.get('/api/products?sort=featured&limit=8');
+                setProducts(productData.products || productData);
+                
+                try {
+                    const vendorData = await apiClient.get('/api/vendors');
+                    setVendors(vendorData.slice(0, 3) || []);
+                } catch (vError) {
+                    console.error('Error fetching vendors:', vError);
+                }
             } catch (error) {
                 console.error('Error fetching products:', error);
             } finally {
                 setLoading(false);
             }
         };
-        fetchProducts();
+        fetchData();
     }, []);
 
     return (
@@ -63,7 +71,7 @@ const Home = () => {
                     <button className="view-all-link">View All</button>
                 </div>
                 {loading ? (
-                    <div className="loading-spinner">Loading products...</div>
+                    <div className="loading-spinner">Loading items...</div>
                 ) : (
                     <div className="grid grid-cols-4 gap-6">
                         {products.map(product => (
@@ -81,9 +89,13 @@ const Home = () => {
                     <button className="view-all-link">View All Stores</button>
                 </div>
                 <div className="grid grid-cols-3 gap-8">
-                    {VENDORS.map(vendor => (
-                        <VendorCard key={vendor.id} vendor={vendor} />
-                    ))}
+                    {vendors.length > 0 ? (
+                        vendors.map(vendor => (
+                            <VendorCard key={vendor._id || vendor.id} vendor={vendor} />
+                        ))
+                    ) : (
+                        <p style={{ opacity: 0.6 }}>No vendors featured yet.</p>
+                    )}
                 </div>
             </section>
 
